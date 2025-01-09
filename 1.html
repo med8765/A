@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מחשבון חישובים</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            text-align: center;
+        }
+        .calculator {
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            max-width: 400px;
+            background-color: #f9f9f9;
+        }
+        input[type="number"] {
+            width: calc(100% - 90px);
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 1rem;
+            text-align: center;
+        }
+        button {
+            padding: 10px;
+            font-size: 0.9rem;
+            margin-left: 5px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #e7f3ff;
+            border: 1px solid #bee3f8;
+            border-radius: 5px;
+        }
+        .result p {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        button.copy-btn {
+            padding: 5px 10px;
+            font-size: 0.9rem;
+            background-color: #4caf50;
+        }
+        button.copy-btn:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h1>מחשבון חישובים</h1>
+    <div class="calculator">
+        <label for="amount">הזן סכום:</label>
+        <input type="number" id="amount" placeholder="הכנס סכום" oninput="calculate()" />
+        <button onclick="pasteAndCopy()">הדבק</button>
+        <div class="result">
+            <p>
+                מעודכן: <span id="updated">0.00</span> ₪
+                <button class="copy-btn" onclick="copyToClipboard('updated')">העתק</button>
+            </p>
+            <p>
+                הפרש: <span id="difference">0.00</span> ₪
+                <button class="copy-btn" onclick="copyToClipboard('difference')">העתק</button>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        function calculate() {
+            // קבלת הערך מתיבת ההזנה
+            const amount = parseFloat(document.getElementById('amount').value) || 0;
+
+            // חישובים
+            const updated = (amount / 1.17) * 1.18; // חישוב ערך מעודכן
+            const difference = updated - amount;   // חישוב הפרש
+
+            // הצגת התוצאות
+            document.getElementById('updated').textContent = updated.toFixed(2);
+            document.getElementById('difference').textContent = difference.toFixed(2);
+        }
+
+        async function pasteAndCopy() {
+            try {
+                // קריאה לערך מהלוח
+                const clipboardText = await navigator.clipboard.readText();
+
+                // ניקוי שדה והדבקת הערך
+                const amountInput = document.getElementById('amount');
+                amountInput.value = clipboardText;
+
+                // חישוב מחדש
+                calculate();
+
+                // העתקה אוטומטית של "הפרש"
+                const difference = document.getElementById('difference').textContent;
+                await navigator.clipboard.writeText(difference);
+            } catch (error) {
+                console.error("שגיאה בהדבקה או בהעתקה:", error);
+            }
+        }
+
+        async function copyToClipboard(id) {
+            const text = document.getElementById(id).textContent;
+            try {
+                await navigator.clipboard.writeText(text);
+            } catch (error) {
+                console.error("שגיאה בהעתקה ללוח:", error);
+            }
+        }
+    </script>
+</body>
+</html>
